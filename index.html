@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroLoop - Live Microphone Loopback & Monitor</title>
+  <meta name="description" content="Turn your computer into a live microphone monitor and loudspeaker system with real-time visual feedback and device control.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="glass-bg-container">
+    <div class="blur-blob blob-1"></div>
+    <div class="blur-blob blob-2"></div>
+    <div class="blur-blob blob-3"></div>
+  </div>
+
+  <main class="app-card">
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+            <line x1="12" x2="12" y1="19" y2="22"/>
+          </svg>
+        </div>
+        <h1>AeroLoop</h1>
+      </div>
+      <p class="subtitle">Live Mic-to-Speaker Monitor</p>
+    </header>
+
+    <!-- Feedback loop warning -->
+    <div class="warning-banner" id="warningBanner">
+      <div class="warning-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+          <line x1="12" x2="12" y1="9" y2="13"/>
+          <line x1="12" x2="12" y1="17" y2="17"/>
+        </svg>
+      </div>
+      <div class="warning-text">
+        <strong>Acoustic Feedback Warning:</strong> Using speakers near your mic can cause loud howling. Use headphones, or keep speaker volume low to start.
+      </div>
+      <button class="close-warning" id="closeWarningBtn">&times;</button>
+    </div>
+
+    <!-- Live status visualizer -->
+    <section class="visualizer-container">
+      <canvas id="audioCanvas" width="800" height="240"></canvas>
+      <div class="status-overlay" id="statusOverlay">
+        <span class="status-indicator"></span>
+        <span class="status-text" id="statusText">System Ready</span>
+      </div>
+    </section>
+
+    <!-- Power Toggle Section -->
+    <section class="power-control">
+      <button class="power-btn" id="powerBtn" aria-label="Toggle Loopback">
+        <div class="power-ring"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="power-icon">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+          <line x1="12" x2="12" y1="2" y2="12"/>
+        </svg>
+      </button>
+      <p class="power-action-hint" id="powerHint">Click to activate microphone</p>
+    </section>
+
+    <!-- Interactive sliders & selectors -->
+    <section class="control-grid">
+      <!-- Volume/Gain Slider -->
+      <div class="control-card volume-card">
+        <div class="card-header">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-icon">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <h3>Monitor Volume</h3>
+          <span class="value-badge" id="volumeVal">80%</span>
+        </div>
+        <div class="slider-wrapper">
+          <input type="range" id="volumeSlider" min="0" max="150" value="80" class="premium-slider">
+        </div>
+      </div>
+
+      <!-- Device Input Selector -->
+      <div class="control-card device-card">
+        <div class="card-header">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-icon">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" x2="16" y1="21" y2="21"/>
+            <line x1="12" x2="12" y1="17" y2="21"/>
+          </svg>
+          <h3>Microphone Input</h3>
+        </div>
+        <div class="select-wrapper">
+          <select id="deviceSelect" class="premium-select">
+            <option value="">Grant permissions to discover microphones...</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Settings / Enhancements -->
+    <section class="advanced-settings">
+      <div class="settings-toggle-header" id="settingsToggle">
+        <h3>Advanced Audio Enhancements</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+
+      <div class="settings-content collapse" id="settingsContent">
+        <div class="switch-grid">
+          <div class="switch-item">
+            <div class="switch-info">
+              <h4>Echo Cancellation</h4>
+              <p>Prevents feedback loops from speakers.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="echoCancel" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="switch-item">
+            <div class="switch-info">
+              <h4>Noise Suppression</h4>
+              <p>Filters out steady background noises.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="noiseSuppress" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="switch-item">
+            <div class="switch-info">
+              <h4>Auto Gain Control</h4>
+              <p>Automatically stabilizes input volume levels.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoGain" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
